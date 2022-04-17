@@ -5,12 +5,21 @@ namespace Sourcefli\CarbonHelpers;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Carbon\CarbonPeriod;
+use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use LogicException;
 use Sourcefli\CarbonHelpers\Exceptions\InvalidDateTimeException;
 
 class CarbonCollection extends Collection
 {
 	use HasDateTimeValues;
+
+	/** @noinspection PhpMissingParentConstructorInspection */
+	public function __construct($items = [])
+	{
+		$this->items = $this->withoutInvalidDatetimeValues($this->getArrayableItems($items));
+	}
 
 	public function current (): CarbonInterface
 	{
@@ -29,22 +38,59 @@ class CarbonCollection extends Collection
 		return $this->toCarbonMutable($this);
 	}
 
+	public static function fromRequest(?Request $request = null): static
+	{
+		$self = new static;
+
+		foreach (($request ?? request())->all() as $value) {
+			if (! $self->isADatetimeValue($value)) {
+				continue;
+			}
+
+			$self->add($value);
+		}
+
+		return $self;
+	}
+
 	public static function fromPeriod (CarbonPeriod $period, bool $toImmutables = true): CarbonCollection
 	{
-		return static::make($period)->when($toImmutables,
-			fn ($self) => $self->asImmutables(),
-			fn ($self) => $self->asMutables(),
+		return static::make($period->toArray())->when($toImmutables,
+			fn (CarbonCollection $self) => $self->asImmutables(),
+			fn (CarbonCollection $self) => $self->asMutables(),
 		);
 	}
 
-	public function getClosestFromToday (): CarbonImmutable
+	public function getClosestFromNow (): CarbonImmutable
 	{
-		return $this->sortByTimestamp()->first();
+		return $this->removeAllInThePast()->whenNotEmpty(
+			fn (CarbonCollection $self) => $self->sortByTimestamp()->first(),
+			fn () => throw new \RangeException('No dates in the future were found in this collection')
+		);
 	}
 
-	public function getFarthestFromToday (): CarbonImmutable
+	public function getFarthestFromNow (): CarbonImmutable
 	{
-		return $this->sortByTimestamp()->last();
+		return $this->removeAllInThePast()->whenNotEmpty(
+			fn (CarbonCollection $self) => $self->sortByTimestamp()->last(),
+			fn () => throw new \RangeException('No dates in the future were found in this collection')
+		);
+	}
+
+	public function getClosestToNow (): CarbonImmutable
+	{
+		return $this->removeAllInTheFuture()->whenNotEmpty(
+			fn (CarbonCollection $self) => $self->sortByTimestamp()->first(),
+			fn () => throw new \RangeException("No dates from the past were found in this collection")
+		);
+	}
+
+	public function getFarthestToNow (): CarbonImmutable
+	{
+		return $this->removeAllInTheFuture()->whenNotEmpty(
+			fn (CarbonCollection $self) => $self->sortByTimestamp()->last(),
+			fn () => throw new \RangeException('No dates from the past were found in this collection')
+		);
 	}
 
 	/**
@@ -64,28 +110,74 @@ class CarbonCollection extends Collection
 		return $this->toDateTimeLocalString($precision)->contains(carbonImmutable($date)->toDateTimeLocalString($precision));
 	}
 
-	public function remove (mixed $datetime, string $comparatorMethod = 'isSameDay'): static
+	/**
+	 * $comparatorMethod signature: function(CarbonInterface $existingValue, mixed $removalValue): bool {...}
+	 * Returning true will remove the datetime value from this collection
+	 */
+	public function remove (mixed $datetime, string|Closure $comparatorMethod = 'is'): static
 	{
-		if (! $this->isADatetimeValue($datetime)) {
+		if (! is_iterable($datetime)) {
+			if (! $this->isADatetimeValue($datetime)) {
+				return $this;
+			}
+
+			foreach ($this as $key => $dtValue) {
+				if (is_string($comparatorMethod)) {
+					if (carbonImmutable($datetime)->{$comparatorMethod}($dtValue)) {
+						unset($this[$key]);
+					}
+					continue;
+				}
+
+				$uCompare = $comparatorMethod($dtValue, $datetime);
+				if (! is_bool($uCompare)) {
+					throw new LogicException("comparator method must return a boolean that determines whether the existing datetime should be removed");
+				}
+
+				if (true === $uCompare) {
+					unset($this[$key]);
+				}
+			}
+
 			return $this;
 		}
 
-		return $this->asImmutables()->filter(
-			fn (CarbonImmutable $date) => carbonImmutable($datetime)->{$comparatorMethod}($date)
-		);
+		foreach ($datetime as $removal) {
+			$this->remove($removal);
+		}
+
+		return $this;
 	}
 
 	public function removeAllByDate (CarbonCollection $exclusions): static
 	{
-		return $this->toDateString()->diff($exclusions->toDateString())->asImmutables();
+		return $this->remove($exclusions, 'isSameDay');
 	}
 
 	public function removeAllByDateTime (CarbonCollection $exclusions, string $precision = 'second'): static
 	{
-		return $this
-			->toDateTimeLocalString($precision)
-			->diff($exclusions->toDateTimeLocalString($precision))
-			->asImmutables();
+		return $this->remove(
+			$exclusions,
+			fn (CarbonInterface $existing, mixed $removal): bool => carbonImmutable($removal)->toDateTimeString($precision) === $existing->toDateTimeString($precision)
+		);
+	}
+
+	public function removeAllInTheFuture(): static
+	{
+		$self = clone $this;
+
+		$exclusions = $self->asImmutables()->filter(fn (CarbonInterface $value) => $value->isAfter(now()));
+
+		return $this->removeAllByDate($exclusions);
+	}
+
+	public function removeAllInThePast(): static
+	{
+		$self = clone $this;
+
+		$exclusions = $self->asImmutables()->filter(fn (CarbonInterface $value) => $value->isBefore(now()));
+
+		return $this->removeAllByDateTime($exclusions);
 	}
 
 	public function sortByTimestamp (): static

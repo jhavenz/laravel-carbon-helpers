@@ -38,8 +38,10 @@
     "autoload": {
         "psr-4": {
             "Sourcefli\\CarbonHelpers\\": "src",
-            "Sourcefli\\CarbonHelpers\\Database\\Factories\\": "database/factories"
-        }
+        },
+        "files": [
+           "src/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

@@ -13,7 +13,7 @@ function carbon(null|CarbonPeriod|DateTimeInterface|int|string $value, ?string $
 	$tz = $tz ?? config('app.timezone');
 
 	return match (true) {
-		func_num_args() === 0 || is_null($value) => Carbon::now($tz),
+		func_num_args() === 0 || blank($value) => Carbon::now($tz),
 		is_int($value) => Carbon::createFromTimestamp($value, $tz),
 		is_string($value) || $value instanceof DateTimeInterface => Carbon::parse($value, $tz),
 		$value instanceof CarbonPeriod => carbon($value->getStartDate(), $tz),

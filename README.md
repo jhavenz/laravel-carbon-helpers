@@ -1,65 +1,107 @@
+# Carbon helpers and CarbonCollection class 
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/support-ukraine.svg?t=1" />](https://supportukrainenow.org)
+Has some basic helper functions to quickly instantiate \Carbon\Carbon or \Carbon\CarbonImmutable instances
+```php
+use function Sourcefli\CarbonHelpers\carbon;
+use function Sourcefli\CarbonHelpers\carbonImmutable;
 
-# Carbon helpers and collection 
+//=> now
+carbon(); 
+carbon('2 weeks ago');
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/sourcefli/laravel-carbon-helpers.svg?style=flat-square)](https://packagist.org/packages/sourcefli/laravel-carbon-helpers)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/sourcefli/laravel-carbon-helpers/run-tests?label=tests)](https://github.com/sourcefli/laravel-carbon-helpers/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/sourcefli/laravel-carbon-helpers/Check%20&%20fix%20styling?label=code%20style)](https://github.com/sourcefli/laravel-carbon-helpers/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/sourcefli/laravel-carbon-helpers.svg?style=flat-square)](https://packagist.org/packages/sourcefli/laravel-carbon-helpers)
+//=> now
+carbonImmutable() 
+carbonImmutable('3 weeks ago')
+```
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+Also has a helpful CarbonCollection class for common logic when dealing with a collection of datetime values
+```php
+use Sourcefli\CarbonHelpers\CarbonCollection;
 
-## Support us
+$period = \Carbon\CarbonPeriod::dates('tomorrow', 'next year');
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-carbon-helpers.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-carbon-helpers)
+//=> has a carbon instance for every date in the Period
+$carbonCollection = CarbonCollection::fromPeriod($period); 
 
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
+//=> ['2022-01-10', '2022-01-11', '2022-01-12', etc.] 
+$carbonCollection->toDateString(); 
 
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+//=> ['2022-01-10 12:00:00', '2022-01-11 12:15:30', '2022-01-12 15:45:45', etc.] -> seconds are acknowledged 
+$carbonCollection->toDateTimeLocalString('second'); 
+
+//=> ['2022-01-10 12:30:00', '2022-01-11 12:45:00', '2022-01-12 15:45:00', etc.] -> minutes are acknowledged (seconds aren't)
+$carbonCollection->toDateTimeLocalString('minute'); 
+```
 
 ## Installation
-
 You can install the package via composer:
 
 ```bash
 composer require sourcefli/laravel-carbon-helpers
 ```
 
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="laravel-carbon-helpers-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="laravel-carbon-helpers-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="laravel-carbon-helpers-views"
-```
-
 ## Usage
-
+More examples:
 ```php
-$carbonHelpers = new Sourcefli\CarbonHelpers();
-echo $carbonHelpers->echoPhrase('Hello, Sourcefli!');
+use Sourcefli\CarbonHelpers\CarbonCollection;
+
+//=> Uses this package's `\Sourcefli\CarbonHelpers\HasDateTimeValues::isADatetimeValue` function to collect datetime values from the request
+CarbonCollection::fromRequest();
+
+//=> filters out everything but ['2020-09-10', '2021-09-11', '2023-10-08']
+$carbonCollection = CarbonCollection::make([
+    'foobar', '2020-09-10', '2021-09-11', new \stdClass, false, 123, '2023-10-08'
+]); 
+
+//=> converts all values to \Carbon\CarbonImmutable instances (filters any/all invalid datetime values in the process)
+$carbonCollection->asImmutables(); 
+
+//=> converts all values to \Carbon\Carbon instances (filters any/all invalid datetime values in the process)
+$carbonCollection->asMutables(); 
+
+
+//=> looks for the closest Carbon instance from today (seeking into the future)
+$carbonCollection->getClosestFromNow(); 
+
+//=> looks for the farthest Carbon instance from today (seeking into the future)
+$carbonCollection->getFarthestFromNow(); 
+
+
+//=> looks for the closest Carbon instance to today (seeking into the past)
+$carbonCollection->getClosestToNow(); 
+
+//=> looks for the farthest Carbon instance from today (seeking into the past)
+$carbonCollection->getFarthestToNow(); 
+
+
+$carbonCollection->removeAllByDate(
+    //=> dates to be removed
+    CarbonCollection::make(['2020-09-10', '2023-10-08']) 
+);
+
+
+$carbonCollection->removeAllByDateTime(
+    //=> removes any datetimes on Jan 10th during the noon hour (different precisions can be used in the 2nd param)
+    CarbonCollection::make(['2022-01-10 12:00:00']), 
+    'hour' 
+);
+
+$carbonCollection->sortByTimestamp();
+
+//=> ignored
+$carbonCollection->remove('foobar') 
+
+
+//=> removes any datetimes having this date
+$carbonCollection->remove('2023-10-08') 
+
+
+//=> Removes any values coming after the predicate. ('2023-10-08' is the predicate value used)
+$carbonCollection->remove('2023-10-08', fn ($value, $predicate) => carbon($predicate)->isBefore($value)) 
 ```
 
 ## Testing
+TODO
 
 ```bash
 composer test
@@ -70,17 +112,13 @@ composer test
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
 ## Contributing
-
-Please see [CONTRIBUTING](https://github.com/spatie/.github/blob/main/CONTRIBUTING.md) for details.
+PRs and ideas are welcome
 
 ## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
+Please email me at mail@jhavens.tech to report security vulnerabilities.
 
 ## Credits
-
 - [Jonathan Havens](https://github.com/sourcefli)
-- [All Contributors](../../contributors)
 
 ## License
 

@@ -5,7 +5,6 @@ namespace Sourcefli\CarbonHelpers;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
-use Illuminate\Support\Stringable;
 use Sourcefli\CarbonHelpers\Exceptions\InvalidDateTimeException;
 use Throwable;
 
@@ -24,7 +23,7 @@ trait HasDateTimeValues
 			return match (TRUE) {
 				$value instanceof DateTimeInterface => true,
 				is_string($value), is_int($value) => false !== strtotime($value),
-				$value instanceof Stringable => $this->isADatetimeValue($value->__toString()),
+				is_object($value) && method_exists($value, '__toString') => $this->isADatetimeValue($value->__toString()),
 				is_object($value) && method_exists($value, 'toString') => $this->isADatetimeValue($value->toString),
 				default => false
 			};
@@ -39,7 +38,7 @@ trait HasDateTimeValues
 			return $this->isADatetimeValue($value) ? carbonImmutable($value) : null;
 		}
 
-		return CarbonCollection::make($value)->withoutInvalidDatetimeValues();
+		return CarbonCollection::make($this->withoutInvalidDatetimeValues($value));
 	}
 
 	protected function toCarbonMutable (mixed $value): null|Carbon|CarbonCollection
@@ -48,11 +47,11 @@ trait HasDateTimeValues
 			return $this->isADatetimeValue($value) ? carbon($value) : null;
 		}
 
-		return CarbonCollection::make($value)->withoutInvalidDatetimeValues();
+		return CarbonCollection::make($this->withoutInvalidDatetimeValues($value));
 	}
 
-	public function withoutInvalidDatetimeValues (): static
+	protected function withoutInvalidDatetimeValues ($values = []): array
 	{
-		return $this->filter(fn ($v) => $this->isADatetimeValue($v));
+		return array_filter($values, fn ($v) => $this->isADatetimeValue($v));
 	}
 }
