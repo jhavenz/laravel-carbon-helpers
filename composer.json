@@ -37,7 +37,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Sourcefli\\CarbonHelpers\\": "src",
+            "Sourcefli\\CarbonHelpers\\": "src"
         },
         "files": [
            "src/helpers.php"
@@ -64,10 +64,7 @@
         "laravel": {
             "providers": [
                 "Sourcefli\\CarbonHelpers\\CarbonHelpersServiceProvider"
-            ],
-            "aliases": {
-                "CarbonHelpers": "Sourcefli\\CarbonHelpers\\Facades\\CarbonHelpers"
-            }
+            ]
         }
     },
     "minimum-stability": "dev",

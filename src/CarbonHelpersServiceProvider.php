@@ -9,8 +9,6 @@ class CarbonHelpersServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
-        $package
-            ->name('laravel-carbon-helpers')
-            ->hasConfigFile();
+        $package->name('laravel-carbon-helpers');
     }
 }
