@@ -38,7 +38,7 @@ trait HasDateTimeValues
 			return $this->isADatetimeValue($value) ? carbonImmutable($value) : null;
 		}
 
-		return CarbonCollection::make($this->withoutInvalidDatetimeValues($value));
+		return new CarbonCollection($value);
 	}
 
 	protected function toCarbonMutable (mixed $value): null|Carbon|CarbonCollection
@@ -47,7 +47,7 @@ trait HasDateTimeValues
 			return $this->isADatetimeValue($value) ? carbon($value) : null;
 		}
 
-		return CarbonCollection::make($this->withoutInvalidDatetimeValues($value));
+		return new CarbonCollection($value);
 	}
 
 	protected function withoutInvalidDatetimeValues ($values = []): array

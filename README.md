@@ -1,4 +1,4 @@
-# Carbon helpers and CarbonCollection class 
+# Carbon helpers and CarbonCollection class for common Carbon operations 
 
 Has some basic helper functions to quickly instantiate \Carbon\Carbon or \Carbon\CarbonImmutable instances
 ```php
@@ -23,14 +23,14 @@ $period = \Carbon\CarbonPeriod::dates('tomorrow', 'next year');
 //=> has a carbon instance for every date in the Period
 $carbonCollection = CarbonCollection::fromPeriod($period); 
 
-//=> ['2022-01-10', '2022-01-11', '2022-01-12', etc.] 
 $carbonCollection->toDateString(); 
+//=> Result example: ['2022-01-10', '2022-01-11', '2022-01-12', etc.] 
 
-//=> ['2022-01-10 12:00:00', '2022-01-11 12:15:30', '2022-01-12 15:45:45', etc.] -> seconds are acknowledged 
 $carbonCollection->toDateTimeLocalString('second'); 
+//=> Result example: ['2022-01-10 12:00:00', '2022-01-11 12:15:30', '2022-01-12 15:45:45', etc.] -> seconds are acknowledged 
 
-//=> ['2022-01-10 12:30:00', '2022-01-11 12:45:00', '2022-01-12 15:45:00', etc.] -> minutes are acknowledged (seconds aren't)
 $carbonCollection->toDateTimeLocalString('minute'); 
+//=> Result example: ['2022-01-10 12:30:00', '2022-01-11 12:45:00', '2022-01-12 15:45:00', etc.] -> minutes are acknowledged (seconds aren't)
 ```
 
 ## Installation
@@ -48,16 +48,17 @@ use Sourcefli\CarbonHelpers\CarbonCollection;
 //=> Uses this package's `\Sourcefli\CarbonHelpers\HasDateTimeValues::isADatetimeValue` function to collect datetime values from the request
 CarbonCollection::fromRequest();
 
-//=> filters out everything but ['2020-09-10', '2021-09-11', '2023-10-08']
+//=> filters out everything but the valid datetime values
 $carbonCollection = CarbonCollection::make([
     'foobar', '2020-09-10', '2021-09-11', new \stdClass, false, 123, '2023-10-08'
 ]); 
+//=> Result example: ['2020-09-10', '2021-09-11', '2023-10-08']
 
-//=> converts all values to \Carbon\CarbonImmutable instances (filters any/all invalid datetime values in the process)
 $carbonCollection->asImmutables(); 
+//=> Result example: \Carbon\CarbonImmutable[] (filters any/all invalid datetime values in the process)
 
-//=> converts all values to \Carbon\Carbon instances (filters any/all invalid datetime values in the process)
 $carbonCollection->asMutables(); 
+//=> Result example: \Carbon\Carbon[] (filters any/all invalid datetime values in the process)
 
 
 //=> looks for the closest Carbon instance from today (seeking into the future)
@@ -74,14 +75,14 @@ $carbonCollection->getClosestToNow();
 $carbonCollection->getFarthestToNow(); 
 
 
+//=> provide the dates to be removed
 $carbonCollection->removeAllByDate(
-    //=> dates to be removed
     CarbonCollection::make(['2020-09-10', '2023-10-08']) 
 );
 
 
+//=> Removes any datetimes on Jan 10th during the noon hour (different precisions can be used as the 2nd param)
 $carbonCollection->removeAllByDateTime(
-    //=> removes any datetimes on Jan 10th during the noon hour (different precisions can be used in the 2nd param)
     CarbonCollection::make(['2022-01-10 12:00:00']), 
     'hour' 
 );

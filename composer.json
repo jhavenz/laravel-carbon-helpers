@@ -1,6 +1,6 @@
 {
     "name": "sourcefli/laravel-carbon-helpers",
-    "description": "Carbon helpers and collection ",
+    "description": "Carbon helpers and CarbonCollection class for common Carbon operations",
     "keywords": [
         "sourcefli",
         "laravel",
