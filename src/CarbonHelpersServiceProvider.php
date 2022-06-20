@@ -1,6 +1,6 @@
 <?php
 
-namespace Sourcefli\CarbonHelpers;
+namespace Jhavenz\CarbonHelpers;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;

@@ -1,10 +1,10 @@
 <?php
 
-namespace Sourcefli\CarbonHelpers\Tests;
+namespace Jhavenz\CarbonHelpers\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Jhavenz\CarbonHelpers\CarbonHelpersServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Sourcefli\CarbonHelpers\CarbonHelpersServiceProvider;
 use Spatie\LaravelRay\RayServiceProvider;
 
 class TestCase extends Orchestra
@@ -14,7 +14,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Sourcefli\\CarbonHelpers\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Jhavenz\\CarbonHelpers\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 

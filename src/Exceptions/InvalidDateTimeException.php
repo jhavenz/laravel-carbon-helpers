@@ -1,6 +1,6 @@
 <?php
 
-namespace Sourcefli\CarbonHelpers\Exceptions;
+namespace Jhavenz\CarbonHelpers\Exceptions;
 
 use InvalidArgumentException;
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace Sourcefli\CarbonHelpers;
+namespace Jhavenz\CarbonHelpers;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
-use Sourcefli\CarbonHelpers\Exceptions\InvalidDateTimeException;
+use Jhavenz\CarbonHelpers\Exceptions\InvalidDateTimeException;
 use Throwable;
 
 trait HasDateTimeValues

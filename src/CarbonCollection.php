@@ -1,6 +1,6 @@
 <?php
 
-namespace Sourcefli\CarbonHelpers;
+namespace Jhavenz\CarbonHelpers;
 
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -8,8 +8,8 @@ use Carbon\CarbonPeriod;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Jhavenz\CarbonHelpers\Exceptions\InvalidDateTimeException;
 use LogicException;
-use Sourcefli\CarbonHelpers\Exceptions\InvalidDateTimeException;
 
 class CarbonCollection extends Collection
 {

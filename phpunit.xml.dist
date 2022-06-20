@@ -19,7 +19,7 @@
     verbose="true"
 >
     <testsuites>
-        <testsuite name="Sourcefli Test Suite">
+        <testsuite name="Jhavenz Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

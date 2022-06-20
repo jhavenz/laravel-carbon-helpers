@@ -2,8 +2,8 @@
 
 Has some basic helper functions to quickly instantiate \Carbon\Carbon or \Carbon\CarbonImmutable instances
 ```php
-use function Sourcefli\CarbonHelpers\carbon;
-use function Sourcefli\CarbonHelpers\carbonImmutable;
+use function Jhavenz\CarbonHelpers\carbon;
+use function Jhavenz\CarbonHelpers\carbonImmutable;
 
 //=> now
 carbon(); 
@@ -16,7 +16,7 @@ carbonImmutable('3 weeks ago')
 
 Also has a helpful CarbonCollection class for common logic when dealing with a collection of datetime values
 ```php
-use Sourcefli\CarbonHelpers\CarbonCollection;
+use Jhavenz\CarbonHelpers\CarbonCollection;
 
 $period = \Carbon\CarbonPeriod::dates('tomorrow', 'next year');
 
@@ -37,15 +37,15 @@ $carbonCollection->toDateTimeLocalString('minute');
 You can install the package via composer:
 
 ```bash
-composer require sourcefli/laravel-carbon-helpers
+composer require Jhavenz/laravel-carbon-helpers
 ```
 
 ## Usage
 More examples:
 ```php
-use Sourcefli\CarbonHelpers\CarbonCollection;
+use Jhavenz\CarbonHelpers\CarbonCollection;
 
-//=> Uses this package's `\Sourcefli\CarbonHelpers\HasDateTimeValues::isADatetimeValue` function to collect datetime values from the request
+//=> Uses this package's `\Jhavenz\CarbonHelpers\HasDateTimeValues::isADatetimeValue` function to collect datetime values from the request
 CarbonCollection::fromRequest();
 
 //=> filters out everything but the valid datetime values
@@ -119,7 +119,7 @@ PRs and ideas are welcome
 Please email me at mail@jhavens.tech to report security vulnerabilities.
 
 ## Credits
-- [Jonathan Havens](https://github.com/sourcefli)
+- [Jonathan Havens](https://github.com/jhavenz)
 
 ## License
 

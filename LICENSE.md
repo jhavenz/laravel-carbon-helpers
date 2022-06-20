@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) sourcefli <mail@jhavens.tech>
+Copyright (c) jhavenz <mail@jhavens.tech>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

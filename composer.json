@@ -1,13 +1,13 @@
 {
-    "name": "sourcefli/laravel-carbon-helpers",
+    "name": "jhavenz/laravel-carbon-helpers",
     "description": "Carbon helpers and CarbonCollection class for common Carbon operations",
     "keywords": [
-        "sourcefli",
+        "jhavenz",
         "laravel",
         "laravel-carbon-helpers",
         "carbon"
     ],
-    "homepage": "https://github.com/sourcefli/laravel-carbon-helpers",
+    "homepage": "https://github.com/jhavenz/laravel-carbon-helpers",
     "license": "MIT",
     "authors": [
         {
@@ -37,7 +37,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Sourcefli\\CarbonHelpers\\": "src"
+            "Jhavenz\\CarbonHelpers\\": "src"
         },
         "files": [
            "src/helpers.php"
@@ -45,7 +45,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Sourcefli\\CarbonHelpers\\Tests\\": "tests"
+            "Jhavenz\\CarbonHelpers\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -63,7 +63,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Sourcefli\\CarbonHelpers\\CarbonHelpersServiceProvider"
+                "Jhavenz\\CarbonHelpers\\CarbonHelpersServiceProvider"
             ]
         }
     },

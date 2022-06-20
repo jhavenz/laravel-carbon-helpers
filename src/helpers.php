@@ -1,6 +1,6 @@
 <?php
 
-namespace Sourcefli\CarbonHelpers;
+namespace Jhavenz\CarbonHelpers;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
